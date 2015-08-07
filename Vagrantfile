@@ -2,38 +2,48 @@
 # vi: set ft=ruby :
 
 setup_script =<<SCRIPT
-sudo apt-get update && \
-sudo apt-get -y install gdb
+sudo apt-get update
 
-# install postgresql server with dev packages and debug symbols
-sudo apt-get -y install curl && \
-echo 'deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main' | sudo sh -c 'cat > /etc/apt/sources.list.d/postgresql.list' && \
-curl -s https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && \
-sudo apt-get update && \
-sudo apt-get -y install postgresql-9.4 postgresql-server-dev-9.4 postgresql-9.4-dbg
+# build postgresql with debug option
+# See http://lets.postgresql.jp/documents/technical/sourcetree/3
+sudo apt-get -y install curl tar bzip2 build-essential libreadline-dev zlib1g-dev gdb
+cd ~vagrant
+curl -sLO https://ftp.postgresql.org/pub/source/v9.4.4/postgresql-9.4.4.tar.bz2
+tar xf postgresql-9.4.4.tar.bz2
+cd postgresql-9.4.4
+./configure --enable-debug
+sed -i.orig '/^CFLAGS =/s/ -O2//' src/Makefile.global
+make
+sudo make install
+sudo useradd --home /usr/local/pgsql/data postgres
+sudo sed -i 's|secure_path="|&/usr/local/pgsql/bin:|' /etc/sudoers
+sudo mkdir /usr/local/pgsql/data
+sudo chown postgres /usr/local/pgsql/data
+echo 'export PATH=/usr/local/pgsql/bin:$PATH' >> ~vagrant/.bash_profile
+export PATH=/usr/local/pgsql/bin:$PATH
+sudo -u postgres initdb -D /usr/local/pgsql/data
+sudo -u postgres postgres -D /usr/local/pgsql/data >logfile 2>&1 &
 
 # build groonga from source
-sudo apt-get -y install wget tar build-essential zlib1g-dev liblzo2-dev libmsgpack-dev libzmq-dev libevent-dev libmecab-dev && \
-cd /usr/local/src && \
-wget http://packages.groonga.org/source/groonga/groonga-5.0.6.tar.gz && \
-tar xvzf groonga-5.0.6.tar.gz && \
-cd groonga-5.0.6 && \
-./configure --enable-debug --enable-fmalloc --enable-memory-debug --with-mecab && \
-make && \
+sudo apt-get -y install curl tar build-essential pkg-config zlib1g-dev liblzo2-dev libmsgpack-dev libzmq-dev libevent-dev libmecab-dev
+cd ~vagrant
+curl -sLO http://packages.groonga.org/source/groonga/groonga-5.0.6.tar.gz
+tar xf groonga-5.0.6.tar.gz
+cd groonga-5.0.6
+./configure --enable-debug --enable-fmalloc --enable-memory-debug --with-mecab
+make
 sudo make install
 
 # build pgroonga from source
-sudo apt-get -y install git pkg-config && \
-cd /usr/local/src && \
-git clone https://github.com/pgroonga/pgroonga && \
-cd pgroonga && \
-make DEBUG=1 && \
+sudo apt-get -y install git
+cd ~vagrant
+git clone https://github.com/pgroonga/pgroonga
+cd pgroonga
+make DEBUG=1
 sudo make install
 
-sudo service postgresql start && \
-sudo -u postgres psql -c "CREATE USER pgroonga WITH SUPERUSER PASSWORD 'pgroonga'" && \
-sudo -u postgres createdb -O pgroonga -E utf8 pgroonga
-sudo -u postgres psql -c "CREATE EXTENSION pgroonga;" pgroonga
+sudo -u postgres createdb -E utf8 test
+sudo -u postgres psql -c "CREATE EXTENSION pgroonga;" test
 SCRIPT
 
 Vagrant.configure(2) do |config|
