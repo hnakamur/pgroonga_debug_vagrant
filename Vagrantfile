@@ -29,7 +29,10 @@ cd ~vagrant
 curl -sLO http://packages.groonga.org/source/groonga/groonga-5.0.6.tar.gz
 tar xf groonga-5.0.6.tar.gz
 cd groonga-5.0.6
-./configure --enable-debug --enable-fmalloc --enable-memory-debug --with-mecab
+./configure --enable-debug --enable-fmalloc --enable-memory-debug \
+  --with-mecab \
+  CFLAGS="-ggdb -fno-omit-frame-pointer" \
+  CXXFLAGS="-ggdb -fno-omit-frame-pointer"
 make
 sudo make install
 
