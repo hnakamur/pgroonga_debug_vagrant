@@ -11,8 +11,7 @@ cd ~vagrant
 curl -sLO https://ftp.postgresql.org/pub/source/v9.4.4/postgresql-9.4.4.tar.bz2
 tar xf postgresql-9.4.4.tar.bz2
 cd postgresql-9.4.4
-./configure --enable-debug
-sed -i.orig '/^CFLAGS =/s/ -O2//' src/Makefile.global
+./configure --enable-cassert --enable-debug CFLAGS="-ggdb -O0 -fno-omit-frame-pointer"
 make
 sudo make install
 sudo useradd --home /usr/local/pgsql/data postgres
@@ -49,10 +48,10 @@ SCRIPT
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
   config.vm.network "private_network", ip: "192.168.33.10"
-  config.vm.synced_folder ".", "/vagrant", type: "nfs"
+#  config.vm.synced_folder ".", "/vagrant", type: "nfs"
   config.vm.provider "vrtualbox" do |vb|
     vb.memory = "2048"
     vb.cpus = 4
   end
-  config.vm.provision "shell", inline: setup_script
+#  config.vm.provision "shell", inline: setup_script
 end
