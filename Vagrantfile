@@ -7,7 +7,7 @@ sudo apt-get update
 # build postgresql with debug option
 # See http://lets.postgresql.jp/documents/technical/sourcetree/3
 sudo apt-get -y install curl tar bzip2 build-essential libreadline-dev zlib1g-dev gdb
-cd ~vagrant
+cd /home/vagrant
 curl -sLO https://ftp.postgresql.org/pub/source/v9.4.4/postgresql-9.4.4.tar.bz2
 tar xf postgresql-9.4.4.tar.bz2
 cd postgresql-9.4.4
@@ -18,14 +18,14 @@ sudo useradd --home /usr/local/pgsql/data postgres
 sudo sed -i 's|secure_path="|&/usr/local/pgsql/bin:|' /etc/sudoers
 sudo mkdir /usr/local/pgsql/data
 sudo chown postgres /usr/local/pgsql/data
-echo 'export PATH=/usr/local/pgsql/bin:$PATH' >> ~vagrant/.bash_profile
+echo 'export PATH=/usr/local/pgsql/bin:$PATH' >> /home/vagrant/.bash_profile
 export PATH=/usr/local/pgsql/bin:$PATH
 sudo -u postgres initdb -D /usr/local/pgsql/data
 sudo -u postgres postgres -D /usr/local/pgsql/data >logfile 2>&1 &
 
 # build groonga from source
 sudo apt-get -y install curl tar build-essential pkg-config zlib1g-dev liblzo2-dev libmsgpack-dev libzmq-dev libevent-dev libmecab-dev
-cd ~vagrant
+cd /home/vagrant
 curl -sLO http://packages.groonga.org/source/groonga/groonga-5.0.6.tar.gz
 tar xf groonga-5.0.6.tar.gz
 cd groonga-5.0.6
@@ -38,7 +38,7 @@ sudo make install
 
 # build pgroonga from source
 sudo apt-get -y install git
-cd ~vagrant
+cd /home/vagrant
 git clone https://github.com/pgroonga/pgroonga
 cd pgroonga
 make DEBUG=1
