@@ -70,6 +70,17 @@ sudo sed -i.orig '/^libdir =/a\
 if not pythondir in sys.path:\
     sys.path.insert(0, pythondir)\
 ' /usr/share/gdb/auto-load/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19-gdb.py
+
+# install pt (the platinum searcher)
+if [ -x /home/vagrant/bin/pt ]; then
+  cd /home/vagrant
+  curl -sLO https://github.com/monochromegane/the_platinum_searcher/releases/download/v1.7.8/pt_linux_amd64.tar.gz
+  tar xf pt_linux_amd64.tar.gz
+  mkdir bin
+  mv pt_linux_amd64/pt bin/
+  rm -r pt_linux_amd64
+  echo 'export PATH=$HOME/bin:$PATH' >> /home/vagrant/.bashrc
+fi
 SCRIPT
 
 Vagrant.configure(2) do |config|
