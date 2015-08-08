@@ -6,7 +6,7 @@ sudo apt-get update
 
 # build postgresql with debug option
 # See http://lets.postgresql.jp/documents/technical/sourcetree/3
-sudo apt-get -y install curl tar bzip2 build-essential libreadline-dev zlib1g-dev gdb ctags
+sudo apt-get -y install curl tar bzip2 build-essential libreadline-dev zlib1g-dev ctags
 cd /home/vagrant
 curl -sLO https://ftp.postgresql.org/pub/source/v9.4.4/postgresql-9.4.4.tar.bz2
 tar xf postgresql-9.4.4.tar.bz2
@@ -24,9 +24,6 @@ echo 'export PATH=/usr/local/pgsql/bin:$PATH' >> /home/vagrant/.bashrc
 export PATH=/usr/local/pgsql/bin:$PATH
 sudo -u postgres initdb -D /usr/local/pgsql/data
 sudo -u postgres postgres -D /usr/local/pgsql/data >logfile 3>&1 &
-cat <<'EOF' >> /home/vagrant/.bashrc
-alias gdbpgsql='sudo gdb postgres `ps auxww | grep '\''[p]ostgres.*idle'\'' | awk '\''{print $2}'\''`'
-EOF
 
 # build groonga from source
 sudo apt-get -y install curl tar build-essential pkg-config zlib1g-dev liblzo2-dev libmsgpack-dev libzmq-dev libevent-dev libmecab-dev
@@ -58,6 +55,21 @@ find . -name '*.[ch]' | xargs ctags -a -f tags --c-kinds=+dfmstuv
 
 sudo -u postgres createdb -E utf8 test
 sudo -u postgres psql -c "CREATE EXTENSION pgroonga;" test
+
+# install gdb
+sudo apt-get -y install gdb
+# add alias for gdb to attach to psql background process
+cat <<'EOF' >> /home/vagrant/.bashrc
+alias gdbpgsql='sudo gdb postgres `ps auxww | grep '\''[p]ostgres.*idle'\'' | awk '\''{print $2}'\''`'
+EOF
+# Modify libstdc++.so.6.0.19-gdb.py to fix the following error
+#  File "/usr/share/gdb/auto-load/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19-gdb.py", line 63, in <module>
+#      from libstdcxx.v6.printers import register_libstdcxx_printers
+#      ImportError: No module named 'libstdcxx'
+sudo sed -i.orig '/^libdir =/a\
+if not pythondir in sys.path:\
+    sys.path.insert(0, pythondir)\
+' /usr/share/gdb/auto-load/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19-gdb.py
 SCRIPT
 
 Vagrant.configure(2) do |config|
