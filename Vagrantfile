@@ -60,7 +60,7 @@ sudo -u postgres psql -c "CREATE EXTENSION pgroonga;" test
 sudo apt-get -y install gdb
 # add alias for gdb to attach to psql background process
 cat <<'EOF' >> /home/vagrant/.bashrc
-alias gdbpgsql='sudo gdb postgres `ps auxww | grep '\''[p]ostgres.*idle'\'' | awk '\''{print $2}'\''`'
+alias gdbpgsql='sudo gdb postgres `ps auxww | grep '\\''[p]ostgres.*idle'\\'' | awk '\\''{print $2}'\\''`'
 EOF
 # Modify libstdc++.so.6.0.19-gdb.py to fix the following error
 #  File "/usr/share/gdb/auto-load/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19-gdb.py", line 63, in <module>
