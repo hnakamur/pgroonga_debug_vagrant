@@ -23,7 +23,7 @@ sudo chown postgres /usr/local/pgsql/data
 echo 'export PATH=/usr/local/pgsql/bin:$PATH' >> /home/vagrant/.bashrc
 export PATH=/usr/local/pgsql/bin:$PATH
 sudo -u postgres initdb -D /usr/local/pgsql/data
-sudo -u postgres postgres -D /usr/local/pgsql/data >logfile 3>&1 &
+sudo -u postgres pg_ctl start -D /usr/local/pgsql/data -l /usr/local/pgsql/data/logfile
 
 # build groonga from source
 sudo apt-get -y install curl tar build-essential pkg-config zlib1g-dev liblzo2-dev libmsgpack-dev libzmq-dev libevent-dev libmecab-dev
