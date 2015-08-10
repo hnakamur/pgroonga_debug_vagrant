@@ -89,7 +89,7 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder ".", "/vagrant", type: "nfs"
   config.vm.provider "vrtualbox" do |vb|
     vb.memory = "2048"
-    vb.cpus = 4
+    vb.cpus = 2
   end
   config.vm.provision "shell", inline: setup_script
 end
